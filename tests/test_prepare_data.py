@@ -1,11 +1,11 @@
 
+from sklearn.datasets import load_iris
 from iris_project.transformers.prepare_data import transform
 
 
-def test_transform():
-    X_train, X_test, y_train, y_test = transform()
+def test_split_is_80_20():
+    df = load_iris(as_frame=True).frame
+    out = transform(df)
 
-    assert len(X_train) == 120
-    assert len(X_test) == 30
-    assert len(y_train) == 120
-    assert len(y_test) == 30
+    assert (out["split"] == "train").sum() == 120
+    assert (out["split"] == "test").sum() == 30

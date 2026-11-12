@@ -1,19 +1,31 @@
 
-from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 
+# Import Mage decorator.
+# If Mage is not installed, use a normal Python function.
+try:
+    from mage_ai.data_preparation.decorators import transformer
+except ImportError:
+    def transformer(func):
+        return func
 
-def transform():
-    iris = load_iris(as_frame=True)
-    X = iris.data
-    y = iris.target
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
+@transformer
+def transform(df, *args, **kwargs):
+    """
+    Divide Iris dataset into 80% training and 20% testing data.
+    """
+
+    train_indices, test_indices = train_test_split(
+        df.index,
         test_size=0.2,
         random_state=42,
-        stratify=y
+        stratify=df["target"]
     )
 
-    return X_train, X_test, y_train, y_test
+    output = df.copy()
+
+    output["split"] = "train"
+    output.loc[test_indices, "split"] = "test"
+
+    return output
